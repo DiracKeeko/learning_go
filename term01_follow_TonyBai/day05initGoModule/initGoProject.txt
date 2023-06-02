@@ -1,0 +1,55 @@
+极小项目的新建
+
+1、新建 main.go
+```
+package main
+
+import "github.com/sirupsen/logrus"
+
+func main() {
+    logrus.Println("hello, gopath mode")
+}
+```
+
+// 此时go run main.go 会报错，因为没有依赖包
+  main.go:3:8: no required module provides package github.com/sirupsen/logrus: go.mod file not found in current directory or any parent directory; see 'go help modules'
+
+// 此时go get github.com/sirupsen/logrus 会报错，因为没有go.mod文件
+  go: go.mod file not found in current directory or any parent directory.
+    'go get' is no longer supported outside a module.
+    To build and install a command, use 'go install' with a version,
+    like 'go install example.com/cmd@latest'
+    For more information, see https://golang.org/doc/go-get-install-deprecation
+    or run 'go help get' or 'go help install'.
+
+2、初始化 go.mod
+命令行输入 go mod init github.com/keeko/go-mode 
+
+go mod init 在当前项目目录下创建了一个 go.mod 文件，这个 go.mod 文件将当前项目变为了一个 Go Module，项目根目录变成了 module 根目录。
+
+// 此时依赖包还没有导入
+
+3、go mod init 下载依赖包及校验
+go mod init 命令还输出了两行日志，提示我们可以使用 go mod tidy 命令，添加 module 依赖以及校验。
+go mod tidy 命令会扫描 Go 源码，并自动找出项目依赖的外部 Go Module 以及版本，下载这些依赖并更新本地的 go.mod 文件。
+
+命令行输入go mod tidy 
+go: finding module for package github.com/sirupsen/logrus
+go: downloading github.com/sirupsen/logrus v1.9.2
+go: found github.com/sirupsen/logrus in github.com/sirupsen/logrus v1.9.2
+go: downloading golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
+go: downloading github.com/stretchr/testify v1.7.0
+go: downloading gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+
+
+// 此时运行 go run main.go 程序执行并输出
+time="2023-06-02T17:20:31+08:00" level=info msg="hello, gopath mode"
+
+
+执行完 go mod tidy 后，当前项目除了 go.mod 文件外，还多了一个新文件 go.sum，
+
+这同样是由 go mod 相关命令维护的一个文件，它存放了特定版本 module 内容的哈希值。
+
+这是 Go Module 的一个安全措施。当将来这里的某个 module 的特定版本被再次下载的时候，go 命令会使用 go.sum 文件中对应的哈希值，和新下载的内容的哈希值进行比对，只有哈希值比对一致才是合法的，这样可以确保你的项目所依赖的 module 内容，不会被恶意或意外篡改。
+
+因此，推荐将 go.mod 和 go.sum 两个文件与源码，一并提交到代码版本控制服务器上。
