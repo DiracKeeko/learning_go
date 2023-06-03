@@ -1,0 +1,60 @@
+
+# 一、新增依赖
+如果我们要为day05项目增加一个新依赖：github.com/google/uuid
+
+1、在main.go中引入uuid这个包
+```
+import (
+	"github.com/sirupsen/logrus"
+	"github.com/google/uuid"
+)
+```
+
+使用这个包
+```
+func main() {
+    logrus.Println("hello, gopath mode")
+		logrus.Println(uuid.NewString())
+}
+```
+
+此时直接使用 > go run main.go（或者go build）会报错，因为没有安装这个包
+main.go:5:2: no required module provides package github.com/google/uuid; to add it:
+        go get github.com/google/uuid
+
+2、安装依赖
+2.1 可以手动执行 go get 命令。
+  > go get github.com/google/uuid
+  (下载go package github.com/google/uuid到本地,并且会自动更新go.mod文件)
+
+2.2 直接执行 go mod tidy
+对于这个例子而言，手工执行 go get 新增依赖项，和执行 go mod tidy 自动分析和下载依赖项的最终效果是等价的。
+但对于复杂的项目变更而言，逐一手工添加依赖项显然很没有效率，go mod tidy 是更佳的选择。
+
+# 二、升级 / 降级依赖的版本
+在实际开发工作中，如果我们认为 Go 命令自动帮我们确定的某个依赖的版本存在一些问题，
+比如，引入了不必要复杂性导致可靠性下降、性能回退等等，我们可以手工将它降级为之前发布的某个兼容版本。
+
+这个操作依赖 “语义导入版本” 机制
+
+Go Module 的版本号采用了语义版本规范，也就是版本号使用 vX.Y.Z 的格式。其中 X 是主版本号，Y 为次版本号 (minor)，Z 为补丁版本号 (patch)。主版本号相同的两个版本，较新的版本是兼容旧版本的。如果主版本号不同，那么两个版本是不兼容的。
+
+以上面提到过的 logrus 为例，logrus 现在就存在着多个发布版本，我们可以通过下面命令来进行查询：
+go list -m -versions github.com/sirupsen/logrus
+
+github.com/sirupsen/logrus v0.1.0 v0.1.1 v0.2.0 v0.3.0 v0.4.0 v0.4.1 v0.5.0 v0.5.1 v0.6.0 v0.6.1 v0.6.2 v0.6.3 v0.6.4 v0.6.5 v0.6.6 v0.7.0 v0.7.1 v0.7.2 v0.7.3 v0.8.0 v0.8.1 v0.8.2 v0.8.3 v0.8.4 v0.8.5 v0.8.6 v0.8.7 v0.9.0 v0.10.0 v0.11.0 v0.11.1 v0.11.2 v0.11.3 v0.11.4 v0.11.5 v1.0.0 v1.0.1 v1.0.3 v1.0.4 v1.0.5 v1.0.6 v1.1.0 v1.1.1 v1.2.0 v1.3.0 v1.4.0 v1.4.1 v1.4.2 v1.5.0 v1.6.0 v1.7.0 v1.7.1 v1.8.0 v1.8.1 v1.8.2 v1.8.3 v1.9.0 v1.9.1 v1.9.2
+
+基于初始状态执行的 go mod tidy 命令，帮我们选择了 logrus 的最新发布版本 v1.9.2。如果你觉得这个版本存在某些问题，想将 logrus 版本降至某个之前发布的兼容版本，比如 v1.7.0，那么我们可以在项目的 module 根目录下，执行带有版本号的 go get 命令：
+
+1、使用 go get packageName@version的方式
+例如:
+> go get github.com/sirupsen/logrus@v1.7.0
+go: downloading github.com/sirupsen/logrus v1.7.0
+go: downloading github.com/stretchr/testify v1.2.2
+go: downgraded github.com/sirupsen/logrus v1.9.2 => v1.7.0
+
+2、使用令 go mod tidy 来帮助我们降级，但前提是首先要用 go mod edit 命令，明确告知我们要依赖 v1.7.0 版本(而不是 v1.9.2)，
+执行步骤是这样的：
+> go mod edit -require=github.com/sirupsen/logrus@v1.9.0
+> go mod tidy
+go: downloading github.com/sirupsen/logrus v1.9.0
