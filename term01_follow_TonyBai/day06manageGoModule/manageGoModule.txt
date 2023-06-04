@@ -91,3 +91,28 @@ go: downloading github.com/go-redis/redis/v7 v7.4.1
 go: added github.com/go-redis/redis/v7 v7.4.1
 
 go get 自动选择了 go-redis v7 版本下当前的最新版本 v7.4.1
+(go.mod 和 go.sum 文件也会被更新)
+
+# 四、升级依赖版本到一个不兼容版本
+有些时候，出于要使用依赖包最新功能特性等原因，我们可能需要将某个依赖的版本升级为其不兼容版本，也就是主版本号不同的版本
+
+以 go-redis/redis 这个依赖为例，将这个依赖从 v7 版本升级到 v9 版本
+按照语义导入版本的原则，不同主版本的包的导入路径是不同的。所以，同样地，我们这里也需要先将代码中 redis 包导入路径中的版本号改为 v9：
+
+import (
+	_ "github.com/go-redis/redis/v9" // "_"为空导入
+	"github.com/sirupsen/logrus"
+	"github.com/google/uuid"
+)
+
+再通过 go get 来获取 v9 版本的依赖包：
+>go get github.com/go-redis/redis/v9
+go: downloading github.com/go-redis/redis/v9 v9.0.5
+go: github.com/go-redis/redis/v9@v9.0.5: parsing go.mod:
+        module declares its path as: github.com/redis/go-redis/v9
+                but was required as: github.com/go-redis/redis/v9
+
+这样，就完成了向一个不兼容依赖版本的升级。
+
+(注意：此时go.mod 和 go.sum 文件没有更新)
+
