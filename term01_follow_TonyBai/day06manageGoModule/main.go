@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/go-redis/redis/v7" // "_"为空导入
 	"github.com/sirupsen/logrus"
 	"github.com/google/uuid"
 )
