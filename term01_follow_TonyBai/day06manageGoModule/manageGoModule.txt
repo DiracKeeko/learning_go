@@ -31,6 +31,7 @@ main.go:5:2: no required module provides package github.com/google/uuid; to add 
 对于这个例子而言，手工执行 go get 新增依赖项，和执行 go mod tidy 自动分析和下载依赖项的最终效果是等价的。
 但对于复杂的项目变更而言，逐一手工添加依赖项显然很没有效率，go mod tidy 是更佳的选择。
 
+
 # 二、升级 / 降级依赖的版本
 在实际开发工作中，如果我们认为 Go 命令自动帮我们确定的某个依赖的版本存在一些问题，
 比如，引入了不必要复杂性导致可靠性下降、性能回退等等，我们可以手工将它降级为之前发布的某个兼容版本。
@@ -116,3 +117,12 @@ go: github.com/go-redis/redis/v9@v9.0.5: parsing go.mod:
 
 (注意：此时go.mod 和 go.sum 文件没有更新)
 
+
+# 五、移除一个依赖
+以前面 go-redis/redis 为例，移除此依赖
+
+删除掉代码中对 redis 的空导入这一行，
+(此时 go build 构建会成功, 且不删除空依赖, go list 命令列出当前 module 的所有依赖，go-redis 仍出现在结果中)
+
+使用 go mod tidy 命令，将这个依赖项彻底从 Go Module 构建上下文中清除掉。
+(go mod tidy 会自动分析源码依赖，而且将不再使用的依赖从 go.mod 和 go.sum 中移除。)
