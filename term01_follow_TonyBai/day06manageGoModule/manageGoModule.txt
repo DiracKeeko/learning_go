@@ -126,3 +126,20 @@ go: github.com/go-redis/redis/v9@v9.0.5: parsing go.mod:
 
 使用 go mod tidy 命令，将这个依赖项彻底从 Go Module 构建上下文中清除掉。
 (go mod tidy 会自动分析源码依赖，而且将不再使用的依赖从 go.mod 和 go.sum 中移除。)
+
+
+# 六、特殊情况：vendor
+vendor 机制虽然诞生于 GOPATH 构建模式主导的年代，但在 Go Module 构建模式下，它依旧被保留了下来，并且成为了 Go Module 构建机制的一个很好的补充。
+在一些不方便访问外部网络，并且对 Go 应用构建性能敏感的环境，如在一些内部的持续集成或持续交付环境（CI/CD）中，使用 vendor 机制可以实现与 Go Module 等价的构建。
+
+和 GOPATH 构建模式不同，Go Module 构建模式下，无需手动维护 vendor 目录下的依赖包。
+
+Go 提供了可以快速建立和更新 vendor 的命令，通过下面命令为该项目建立 vendor：
+>go mod vendor
+
+go mod vendor 命令在 vendor 目录下，创建了一份这个项目的依赖包的副本，并且通过 vendor/modules.txt 记录了 vendor 下的 module 以及版本。
+
+如果我们要基于 vendor 构建，而不是基于本地缓存的 Go Module 构建，我们需要在 go build 后面加上 -mod=vendor 参数。
+
+在 Go 1.14 及以后版本中，如果 Go 项目的顶层目录下存在 vendor 目录，那么 go build 默认也会优先基于 vendor 构建。
+(如果 Go 项目的顶层目录下存在 vendor 目录时想基于Go Module构建，需要给 go build 传入 -mod=mod 的参数。)
