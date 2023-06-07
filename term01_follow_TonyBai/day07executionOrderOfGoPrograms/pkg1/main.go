@@ -12,6 +12,7 @@ func Main() {
 
 /* 
 	main 函数就主要是用来在包 pkg1 内部使用的，它是没法在包外使用的。
+	main函数虽然是用户层逻辑的入口函数，但main却不一定是用户层第一个被执行的函数。这跟 Go 语言的另一个函数 init 有关。
 */
 func main() {
     fmt.Println("main func for pkg1")
