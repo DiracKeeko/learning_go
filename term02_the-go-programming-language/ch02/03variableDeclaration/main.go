@@ -20,8 +20,8 @@ func main() {
 
 	// 也可以在一个声明语句中同时声明一组变量，或用一组初始化表达式声明并初始化一组变量。
 	// 如果省略每个变量的类型，将可以声明多个类型不同的变量（类型由初始化表达式推导）：
-	var i, j, k int                 // int, int, int
-	var b, f, s = true, 2.3, "four" // bool, float64, string
+	var i, j int // int, int
+	// var boo, flo, str = true, 2.3, "four" // bool, float64, string
 
 	// # 简短变量声明
 
@@ -37,20 +37,15 @@ func main() {
 	//因为简洁和灵活的特点，简短变量声明被广泛用于大部分的局部变量的声明和初始化。
 	//var形式的声明语句往往是用于需要显式指定变量类型的地方，或者因为变量稍后会被重新赋值而初始值无关紧要的地方。
 
-	i := 100                  // an int
+	x := 100                  // an int
 	var boiling float64 = 100 // a float64
 	var names []string
 	var err error
-	var p Point
+	fmt.Println(x, boiling, names, err)
 
 	i, j = j, i // 交换 i 和 j 的值
 
 	// 和普通var形式的变量声明语句一样，简短变量声明语句也可以用函数的返回值来声明和初始化变量，像下面的os.Open函数调用将返回两个值：
-
-	f, err := os.Open(name)
-	if err != nil {
-		return err
-	}
-	// ...use f...
-	f.Close()
+	f, err := os.Open("fileName")
+	fmt.Println(f)
 }
